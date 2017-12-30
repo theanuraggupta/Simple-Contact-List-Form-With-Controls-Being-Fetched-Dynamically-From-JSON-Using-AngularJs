@@ -1,0 +1,118 @@
+<!--
+
+Author - Anurag Gupta
+Date - 14th July'17
+
+-->
+<html>
+	<head>
+		<title>Cordis - Project X</title>
+		<meta charset="utf-8">
+		<link href="contactList.css" type="text/css" rel="stylesheet">
+		<link href="bootstrap/css/bootstrap.css" type="text/css" rel="stylesheet">
+		<link href="bootstrap/css/bootstrap-theme.css" type="text/css" rel="stylesheet">
+		<link href="bootstrap/css/bootstrap-theme.min.css" type="text/css" rel="stylesheet">
+		<link href="bootstrap/css/bootstrap.min.css" type="text/css" rel="stylesheet">
+		<link href="bootstrap/css/bootstrap.css.map" type="text/css" rel="stylesheet">
+		<link href="bootstrap/css/bootstrap.min.css.map" type="text/css" rel="stylesheet">
+		<link href="bootstrap/css/bootstrap-theme.css.map" type="text/css" rel="stylesheet">
+		<link href="bootstrap/css/bootstrap-theme.min.css.map" type="text/css" rel="stylesheet">
+		<script data-require="angular.js@1.4.5" data-semver="1.4.5" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
+		<script data-require="jquery@*" data-semver="3.1.1" src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	</head>
+
+	<body class="container-fluid" ng-app="ContactModule" ng-controller="contactController">
+		<div class="form-container">
+			<span id="alertbox" class="alert-box" ng-repeat="alert in alerts" ng-class="{'alert-danger': alert.type==='danger', 'alert-success' : alert.type==='success'}">
+				<span ng-bind="alert.message"></span>
+				<span href="" class="pull-right" ng-click="removeAlert()"><i class="glyphicon glyphicon-remove"></i></span>
+			</span>
+			<div class="margin-lr">
+				<h3 class="form-title" ng-bind="::dynamicFieldControls.SectionTitle"></h3>
+				<form name="contactForm" class="clear clearfix form-horizontal bottom-gap" ng-class="{'form-border': contactList.length}" ng-submit="contactForm.$valid && buttonClicked(4, contactInfo)" ng-if="showForm" id="contactForm">
+					<div ng-repeat="control in dynamicFieldControls.ControlDetails">
+						<div ng-if="control.ControlType==='text' || control.ControlType==='number'" class="col-xs-12 col-xs-6 form-group-sm bottom-gap" >
+							<label class="col-md-4 label-control" ng-bind="::control.DisplayName"></label>
+							<div class="col-md-6 no-padding-lr" ng-class="{'has-error': contactForm.{{control.FieldName}}.$invalid, 'has-success': contactForm.{{control.FieldName}}.$valid}" title="{{control.ErrorMessage}}">
+								<input ng-pattern="control.Pattern" name="{{control.FieldName}}" type="{{control.ControlType}}" ng-model="contactInfo[control.NGModelName]" placeholder="{{control.PlaceHolderText}}" class="form-control" ng-required="control.Mandatory" ng-disabled="control.IsReadOnly"/>
+							</div>
+						</div>
+						<div ng-if="control.ControlType==='email'" class="col-xs-12 col-xs-6 form-group-sm bottom-gap" >
+							<label class="col-md-4 label-control" ng-bind="::control.DisplayName"></label>
+							<div class="col-md-6 no-padding-lr" ng-class="{'has-error': contactForm.{{control.FieldName}}.$invalid, 'has-success': contactForm.{{control.FieldName}}.$valid}" title="{{control.ErrorMessage}}">
+								<input ng-pattern="/^[_A-Za-z0-9]+(\.[_A-Za-z0-9]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*(\.[A-Za-z]{2,4})$/" name="{{control.FieldName}}" type="{{control.ControlType}}" ng-model="contactInfo[control.NGModelName]" placeholder="{{control.PlaceHolderText}}" class="form-control" ng-required="control.Mandatory" ng-disabled="control.IsReadOnly"/>
+							</div>
+						</div>
+					</div>
+					<div class="button-gap text-center row col-xs-12 bottom-gap">
+						<button type="button" class="btn btn-sm" ng-class="{'btn-success': contactInfo.id, 'btn-info': !contactInfo.id}" ng-disabled="contactForm.$invalid" ng-click="buttonClicked(4, contactInfo)">
+							<i class="glyphicon glyphicon-ok"></i>
+							<span ng-if="!contactInfo.id">Add</span>
+							<span ng-if="contactInfo.id">Update</span>
+						</button>
+						<button type="button" class="btn btn-danger btn-sm" ng-if="contactList.length" ng-click="buttonClicked(5)">
+							<i class="glyphicon glyphicon-remove"></i>
+							<span>Cancel</span>
+						</button>
+					</div>
+				</form>
+				<div class="clear clearfix bottom-gap" ng-show="contactList.length">
+					<div class="input-group input-group-sm col-md-7 center-content">
+						<a href="" class="input-group-addon dropdown-toggle" ng-class="{'search-add-background': !showToggle, 'search-remove-background': showToggle}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-click="showToggle=!showToggle;"><i class="glyphicon" ng-class="{'glyphicon-plus': !showToggle, 'glyphicon-remove': showToggle}"></i></a>
+						<ul class="dropdown-menu" ng-show="showToggle">
+							<li ng-repeat="choice in dynamicFieldControls.ControlDetails" ng-click="addSearchFilter(choice, true)">
+								<a data-target="#" ng-bind="choice.DisplayName"></a>
+							</li>
+						</ul>
+						<span class="input-group-addon search-addon background-white" ng-show="selectedItem.FieldName">
+							<span ng-bind="selectedItem.DisplayName"></span>
+							<i href class="glyphicon glyphicon-remove cursor-pointer" ng-click="addSearchFilter()"></i>
+						</span>
+						<input ng-model="searchText" class="form-control no-box-shadow" placeholder="{{searchPlaceholder}}" ng-change="getFilteredValue(searchText, selectedItem.FieldName)">
+						<span class="input-group-addon search-addon"><i class="glyphicon glyphicon-search"></i></span>
+					</div>
+				</div>
+				<div class="table-responsive clear clearfix bottom-gap" ng-if="contactList.length">
+					<!--Add New Contact-->
+					<div class="text-left clear clearfix" ng-if="!showForm">
+						<button type="button" class="btn btn-xs btn-info" ng-click="buttonClicked(1)">
+							<i class="glyphicon glyphicon-plus"></i>
+							<span>Add New Contact</span>
+						</button>
+					</div>
+					<!--Add New Contact-->
+					<!--Contact List-->
+					<table class="table-std">
+						<thead>
+							<th ng-repeat="field in dynamicFieldControls.ControlDetails" ng-bind="field.DisplayName"></th>
+							<th class="text-center" ng-if="dynamicFieldControls.ControlDetails.length">Actions</th>
+						</thead>
+						<tbody class="table-body">
+							<tr ng-repeat="contact in (filteredArray = (contactList | filter: searchText))">
+								<td ng-repeat="field in dynamicFieldControls.ControlDetails" ng-bind="contact[field.NGModelName]"></td>
+								<td class="text-center button-gap" ng-if="dynamicFieldControls.ControlDetails.length">
+									<button class="btn btn-xs btn-success btn-radius" ng-click="buttonClicked(2, contact, $index, contactList.length)">
+										<i class="glyphicon glyphicon-edit"></i>
+										<span>Edit</span>
+									</button>
+									<button type="button" class="btn btn-xs btn-danger btn-radius" ng-click="buttonClicked(3, contact, $index, contactList.length)">
+										<i class="glyphicon glyphicon-trash"></i>
+										<span>Delete</span>
+									</button>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<!--Contact List-->
+					<!--No data found message-->
+					<div class="text-center border-grey padding-t" ng-if="!filteredArray.length">
+						<label class="text-center">No records found!</label>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script src="contactList.js" type="text/javascript"></script>
+	<script src="bootstrap/js/bootstrap.js" type="text/javascript"></script>
+	<script src="bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+</html>
