@@ -5,7 +5,11 @@
 
 /*alignment classes*/
 body{
-	margin: 10px !important;
+	padding: 24px;
+	width: 100% !important;
+	position: fixed;
+	height: 100%;
+	background: #585858 !important;
 }
 .row{
 	margin-left: -10px !important;
@@ -159,7 +163,7 @@ button.btn-success: hover {
     margin-right: 0 !important;
 }
 
-//For utmost left and right buttons have no margin
+/* For utmost left and right buttons have no margin */
 .button-gap>.btn:first-child {
     margin-left: 0 !important;
     margin-right: 5px !important;
@@ -175,6 +179,7 @@ button.btn-success: hover {
 /*form classes*/
 .form-container{
 	position: relative;
+	top: 5em;
 	margin-top: 10px !important;
 	margin-bottom: 10px !important;
     background: white !important;
