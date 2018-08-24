@@ -10,7 +10,7 @@ Validation for Phone number and Email Id as well as checking for their duplicacy
 # Development Run
 Just open ContactList.html in any browser
 
-FYI - All the button click features are working with a hard coded JSON array.
+FYI - All the button click functionalities worked on a hard coded JSON array.
 
 # Screenshots
 
