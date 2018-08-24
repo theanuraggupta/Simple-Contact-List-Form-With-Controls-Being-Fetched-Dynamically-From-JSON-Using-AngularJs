@@ -3,7 +3,9 @@ HTML, Css, Bootstrap, AngularJs
 
 # ContactList
 A simple form with proper design to add, update, edit and delete contact list having First Name,
-Last Name, Mobile Number, Email Idas fields
+Last Name, Mobile Number, Email Idas fields.
+
+Validation for Phone number and Email Id as well as checking for their duplicacy.
 
 # Development Run
 Just open ContactList.html in any browser
